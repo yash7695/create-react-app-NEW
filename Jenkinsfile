@@ -7,8 +7,8 @@ pipeline {
 
   environment {
     CI = 'false'
-    AWS_DEFAULT_REGION = 'ap-south-1' // change to your bucket's region
-    BUCKET_NAME = 'your-s3-bucket-name'
+    AWS_DEFAULT_REGION = 'us-east-1' // change to your bucket's region
+    BUCKET_NAME = 'yash-react-app'
   }
 
   stages {
