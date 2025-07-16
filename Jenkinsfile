@@ -7,6 +7,8 @@ pipeline {
 
   environment {
     CI = 'false'
+    AWS_DEFAULT_REGION = 'ap-south-1' // change to your bucket's region
+    BUCKET_NAME = 'your-s3-bucket-name'
   }
 
   stages {
@@ -28,27 +30,23 @@ pipeline {
       }
     }
 
-    stage('Serve Build (Optional)') {
+    stage('Deploy to S3') {
       steps {
-        sh '''
-          npm install -g serve
-          serve -l 3000 build &
-          sleep 10
-          curl -I http://localhost:3000 || true
-        '''
-      }
-    }
-
-    stage('Archive Artifacts') {
-      steps {
-        archiveArtifacts artifacts: 'build/**', fingerprint: true
+        withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          sh '''
+            aws s3 sync build/ s3://$BUCKET_NAME/ --delete
+          '''
+        }
       }
     }
   }
 
   post {
-    always {
-      cleanWs()
+    success {
+      echo '✅ Deployed to S3 successfully.'
+    }
+    failure {
+      echo '❌ Deployment failed.'
     }
   }
 }
