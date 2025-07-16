@@ -2,11 +2,11 @@ pipeline {
   agent any
 
   tools {
-    nodejs 'Node-18' // Make sure this matches your Jenkins NodeJS tool name
+    nodejs 'Node-18'
   }
 
   environment {
-    CI = 'false' // Avoid Create React App exiting on warnings
+    CI = 'false'
   }
 
   stages {
@@ -28,7 +28,18 @@ pipeline {
       }
     }
 
-    stage('Archive Build Artifacts') {
+    stage('Serve Build (Optional)') {
+      steps {
+        sh '''
+          npm install -g serve
+          serve -l 3000 build &
+          sleep 10
+          curl -I http://localhost:3000 || true
+        '''
+      }
+    }
+
+    stage('Archive Artifacts') {
       steps {
         archiveArtifacts artifacts: 'build/**', fingerprint: true
       }
@@ -36,12 +47,6 @@ pipeline {
   }
 
   post {
-    success {
-      echo '✅ Build succeeded.'
-    }
-    failure {
-      echo '❌ Build failed.'
-    }
     always {
       cleanWs()
     }
