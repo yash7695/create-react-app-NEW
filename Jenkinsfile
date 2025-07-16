@@ -13,6 +13,17 @@ pipeline {
             }
         }
 
+        stage('Check Environment') {
+         steps {
+                 sh 'echo $PATH'
+                 sh 'which node || echo "Node not found"'
+                 sh 'which npm || echo "NPM not found"'
+                 sh 'node -v || echo "No node version"'
+                 sh 'npm -v || echo "No npm version"'
+            }
+        }
+
+
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
