@@ -2,11 +2,11 @@ pipeline {
   agent any
 
   tools {
-    nodejs 'Node18' // Use the NodeJS version installed in Jenkins (must match the name)
+    nodejs 'Node-18' // Must match your configured tool name in Jenkins
   }
 
   environment {
-    CI = 'false' // Prevent Create React App from exiting on warnings
+    CI = 'false' // Prevent CRA from treating warnings as errors
   }
 
   stages {
@@ -19,31 +19,3 @@ pipeline {
     stage('Run Tests') {
       steps {
         sh 'npm test -- --watchAll=false'
-      }
-    }
-
-    stage('Build React App') {
-      steps {
-        sh 'npm run build'
-      }
-    }
-
-    stage('Archive Production Build') {
-      steps {
-        archiveArtifacts artifacts: 'build/**', fingerprint: true
-      }
-    }
-  }
-
-  post {
-    success {
-      echo "✅ React app built successfully."
-    }
-    failure {
-      echo "❌ Build failed. Please check the logs."
-    }
-    always {
-      cleanWs()
-    }
-  }
-}
